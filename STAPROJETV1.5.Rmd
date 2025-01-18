@@ -1,0 +1,142 @@
+---
+title: "STDprojet"
+author: ""
+date: "2025-01-02"
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    latex_engine: xelatex
+  word_document: default
+---
+1)Installer les librairies classiques vus pendant le cours sur R
+```{r}
+#install.packages("questionr")
+#install.packages("dplyr")
+library (questionr)
+library(dplyr)
+```
+2)Installer les librairies ggplot2 pour les graphiques et readxl pour importer le fichier dedonnées Excel
+```{r}
+#install.packages("readxl")
+#install.packages("ggplot2")
+library(readxl)
+library(ggplot2)
+```
+3)Importer le fichier de données dans votre environnement de travail Rstudio
+```{r}
+Data_projet <- read_excel("C:/Users/lenovo/Desktop/L3 INF0/STA501/DataTest.xlsx")
+```
+4)Afficher les 15 premières lignes et les 15 dernières les lignes
+```{r}
+print("les 15 premières lignes:")
+print(head(Data_projet,15))
+print("les 15 dernières les lignes:")
+print(tail(Data_projet,15))
+```
+5)Afficher le résumé des données
+```{r}
+summary(Data_projet)
+```
+6)En utilisant la première colonne (Data_projet$Espèce_poisson), représenter sous forme de diagramme en bâton les espèces de poissons (en abscisse) en fonction de leur fréquence (en ordonnée)
+```{r}
+poisson_freq_espece=sort(table(Data_projet$Espèce_poisson))
+barplot(poisson_freq_espece, main = "diagramme en bâton de frequence",
+        xlab = " les espèces de poissons",
+        ylab = "fréquence", las = 2)
+```
+Remarque : L'axe horizontal représente les espèces de poissons, et l'axe vertical indique la fréquence d'apparition de chaque espèce.
+Conclusion : On peut voir que le GAR a été capturé le plus souvent, suivi par le BRC et le PER etc,le plus petit(moindre) est CHE.
+
+
+7)En utilisant la colonne (Data_projet$poids), représenter sous forme de diagramme en bâton le poids des poissons en fonction de leur fréquence
+```{r}
+poisson_freq_poids=sort(table(Data_projet$poids))
+barplot(poisson_freq_poids, main = "diagramme en bâton de frequence",
+        xlab = " les poids de poissons", ylab = "fréquence")
+```
+Remarque : L'axe horizontal représente le poids des poissons et l'axe vertical montre la fréquence correspondante. 
+Conclusion : La plupart des poids des poissons se concentrent dans une plage assez étroite, montrant que la taille des échantillons capturés est assez homogène.
+
+8) En utilisant la colonne (Data_projet$longueur), représenter sous forme de diagramme en bâton la longueur des poissons en fonction de leur fréquence
+```{r}
+poisson_freq_longueur=sort(table(Data_projet$longueur))
+barplot(poisson_freq_longueur,main = "diagramme en bâton de frequence",xlab = " longueur de poissons", 
+           ylab = "fréquence",las = 2)
+```
+Remarque: L'axe horizontal représente la longueur des poissons, et l'axe vertical montre la fréquence de ces longueurs. 
+Conclusion: La distribution des longueurs est concentrée dans une certaine plage, montrant que la plupart des poissons ont des longueurs similaires.
+
+9)Sur un même graphique, représenter sous forme de boite à moustache (boxplot), la distribution des poids de chaque espèce de poisson. Les boites à moustaches auront des couleurs différentes et seront associées à chacune des espèces.
+```{r}
+boxplot(Data_projet$poids ~ Data_projet$Espèce_poisson,main = "Répartition du poids des espèces de poissons",
+        xlab = "espèces de poissons",
+        ylab = "poids(g)",
+        col = rainbow(length(unique(Data_projet$Espèce_poisson))),
+        las = 2)
+```
+Remarque : Chaque boîte à moustaches montre la répartition du poids d'un type de poisson. La médiane est indiquée par une ligne horizontale, la boîte représente l'intervalle interquartile, et les points extérieurs sont des valeurs aberrantes.
+Conclusion : Il y a des différences significatives dans la répartition du poids entre les différentes espèces de poissons. 
+Les poids de CAC, BRO et SAN varient beaucoup et sont en moyenne plus élevés, ce qui suggère que ces poissons pourraient être plus gros. Les autres poissons ont une plage de poids et la moyenne plus petite, ce qui indique qu'ils pourraient être plus petits.
+
+10)Sur un même graphique, représenter sous forme de boite à moustache (boxplot),la distribution des longueurs de chaque espèce de poisson. Les boites à moustaches auront des couleurs différentes et seront associées à chacune des espèces. 
+```{r}
+boxplot(Data_projet$longueur ~ Data_projet$Espèce_poisson,
+        main = "Répartition des longueurs des espèces de poissons",
+        xlab = "espèces de poissons",
+        ylab = "longueurs (mm)",
+        col =rainbow(length(unique(Data_projet$Espèce_poisson))),
+        las = 2)
+```
+Conclusion : Il y a des différences significatives dans la répartition des longueurs entre les différentes espèces de poissons.
+Les longueurs de BRC, BRO et SAN sont clairement plus longues, avec une médiane plus élevée, ce qui indique que ces poissons sont généralement plus grands. En revanche, ABL, GRE et PER ont une distribution de longueur plus petite, ce qui signifie qu'ils sont généralement des poissons de petite taille.
+
+11) Représenter sous forme de nuage de points le poids des poissons fonction de leur longueur
+```{r}
+plot(Data_projet$longueur, Data_projet$poids,
+     main = "La relation entre le poids et la longueur du poisson",
+     xlab = "longueur(mm)",
+     ylab = "poids(g)")
+```
+Remarque : L'axe horizontal représente la longueur, l'axe vertical représente le poids, chaque point montre deux indicateurs d'un poisson.
+Conclusion : Le poids et la longueur sont positivement corrélés, les poissons plus longs sont généralement plus lourds.
+
+12)Faire une régression de linéaire de poids en fonction de la longueur des poissons 
+```{r}
+model=lm(poids ~ longueur, data = Data_projet)
+summary(model)
+plot(Data_projet$longueur, Data_projet$poids,
+main = "Régression linéaire: poids du poisson par rapport à la longueur",
+     xlab = "longueur(mm)",
+     ylab = "poids(g)")
+
+#ligne
+abline(model, col = "red", lwd = 2)
+```
+Remarque : L'équation de régression est de la forme : poids = a + b * longueur Selon les données de sortie de summary (Coefficients):
+On a poids = -782.26 + 4.2 * longueur
+D'après le nuage de points de la question précédente.
+On a trouvé qu'il y a une relation linéaire positive significative entre le poids et la longueur des poissons.Plus la longueur est grande, plus le poids est lourd.
+
+13)Faire un Khi-2 non testé pour savoir et une différence de signification entre les stations Quand au sujet du nombre d’espèces de poissons dans chaque station.
+```{r}
+tab=table(Data_projet$Station_peche,Data_projet$Espèce_poisson)
+# test-chi2
+chi2_test <- chisq.test(tab)
+# res de chi2
+print(chi2_test)
+cat("statistique du chi2:",chi2_test$statistic,"\n")
+cat("ddl:",chi2_test$parameter,"\n")
+cat("P:",chi2_test$p.value, "\n")
+if (chi2_test$p.value < 0.05) {
+  print("Conclusion: Il existe des différences significatives dans la répartition des espèces de poissons selon les sites.\n")
+} else {
+  print("Conclusion:Il n'y a pas de différence significative dans la répartition des espèces de poissons selon les sites.\n")
+}
+```
+Remarque : Vérifier s'il y a un lien entre les sites d'échantillonnage et la distribution des espèces de poissons. La valeur du chi carré et la valeur P montrent si c'est significatif. 
+Conclusion : On a un P < 0,05, donc la distribution des poissons dépend vraiment des sites, ce qui montre qu'il y a des différences claires dans les espèces de poissons capturées selon les sites.
+
+14) Faire un mini rapport contenant vos résultats graphiques et statistiques que vous interpréterez. Mettez aussi votre code R dans le mini rapport. 
+Résumé : Ces analyses montrent qu'il y a une relation significative entre le poids et la longueur des poissons. La distribution des différentes espèces de poissons est influencée par plusieurs facteurs comme le site et les caractéristiques de chaque espèce.
+
